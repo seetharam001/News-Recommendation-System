@@ -7,18 +7,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
 
-# -------------------------------------------------
 # PAGE CONFIG
-# -------------------------------------------------
 st.set_page_config(
     page_title="AI News Recommendation System",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# -------------------------------------------------
-# FLAT DARK-LIGHT UI (NO WHITE CARDS)
-# -------------------------------------------------
 st.markdown(
     """
     <style>
@@ -43,9 +38,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# -------------------------------------------------
-# HEADER (NO CARD)
-# -------------------------------------------------
 st.markdown(
     """
     <h1 style="text-align:center;">📰 AI News Recommendation System</h1>
@@ -57,30 +49,22 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# -------------------------------------------------
 # LOAD DATA
-# -------------------------------------------------
 df = pd.read_csv("dataset/news.csv")
 TEXT_COLUMN = "description"
 
-# -------------------------------------------------
-# NLP SETUP (STOPWORDS ONLY – CLOUD SAFE)
-# -------------------------------------------------
+# Pre Processing
 nltk.download("stopwords")
 stop_words = set(stopwords.words("english"))
-
 def preprocess(text):
     text = text.lower()
     text = re.sub(r"[^a-z]", " ", text)
     words = text.split()
     words = [w for w in words if w not in stop_words]
     return " ".join(words)
-
 df["clean_text"] = df[TEXT_COLUMN].apply(preprocess)
 
-# -------------------------------------------------
 # MODEL (TF-IDF + COSINE SIMILARITY)
-# -------------------------------------------------
 vectorizer = TfidfVectorizer(max_features=5000)
 tfidf_matrix = vectorizer.fit_transform(df["clean_text"])
 similarity_matrix = cosine_similarity(tfidf_matrix)
@@ -91,9 +75,7 @@ def recommend_news(index, top_n=5):
     scores = scores[1:top_n+1]
     return [df.iloc[i[0]][TEXT_COLUMN] for i in scores]
 
-# -------------------------------------------------
 # SIDEBAR
-# -------------------------------------------------
 st.sidebar.header("🛠 Controls")
 st.sidebar.write("Select an article to get similar news.")
 
@@ -112,22 +94,18 @@ top_n = st.sidebar.slider(
     3, 10, 5
 )
 
-# -------------------------------------------------
+
 # SELECTED ARTICLE
-# -------------------------------------------------
 st.subheader("📄 Selected Article")
 st.write(df.iloc[st.session_state.article_index][TEXT_COLUMN])
 
-# -------------------------------------------------
-# BUTTON
-# -------------------------------------------------
+
+# RECOMMENDATION BUTTON
 st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
 clicked = st.button("✨ Recommend Similar Articles")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# -------------------------------------------------
 # RECOMMENDATIONS
-# -------------------------------------------------
 if clicked:
     st.subheader("🔍 Recommended Articles")
 
@@ -140,9 +118,7 @@ if clicked:
         with st.expander(f"📰 Recommendation {i}"):
             st.write(rec)
 
-# -------------------------------------------------
 # FOOTER
-# -------------------------------------------------
 st.markdown(
     """
     <hr>

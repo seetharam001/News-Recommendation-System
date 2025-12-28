@@ -6,7 +6,6 @@ import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 
 # -------------------------------------------------
 # PAGE CONFIG
@@ -18,15 +17,52 @@ st.set_page_config(
 )
 
 # -------------------------------------------------
+# CUSTOM CSS (CLEAN & PROFESSIONAL)
+# -------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .main {
+        background-color: #f6f8fb;
+    }
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    .card {
+        background-color: #ffffff;
+        padding: 18px 22px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        margin-bottom: 18px;
+    }
+    .title {
+        text-align: center;
+        font-size: 34px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 16px;
+        color: #666;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# -------------------------------------------------
 # HEADER
 # -------------------------------------------------
 st.markdown(
     """
-    <h1 style='text-align:center;'>📰 AI-Powered News Recommendation System</h1>
-    <p style='text-align:center; font-size:18px;'>
-    Content-Based Recommendation using NLP & Machine Learning
-    </p>
-    <hr>
+    <div class="card">
+        <div class="title">📰 AI News Recommendation System</div>
+        <div class="subtitle">
+            Discover similar news articles using NLP & Machine Learning
+        </div>
+    </div>
     """,
     unsafe_allow_html=True
 )
@@ -38,19 +74,16 @@ df = pd.read_csv("dataset/news.csv")
 TEXT_COLUMN = "description"
 
 # -------------------------------------------------
-# NLP SETUP
+# NLP SETUP (STOPWORDS ONLY – CLOUD SAFE)
 # -------------------------------------------------
 nltk.download("stopwords")
-nltk.download("wordnet")
-
 stop_words = set(stopwords.words("english"))
-lemmatizer = WordNetLemmatizer()
 
 def preprocess(text):
     text = text.lower()
     text = re.sub(r"[^a-z]", " ", text)
     words = text.split()
-    words = [lemmatizer.lemmatize(w) for w in words if w not in stop_words]
+    words = [w for w in words if w not in stop_words]
     return " ".join(words)
 
 df["clean_text"] = df[TEXT_COLUMN].apply(preprocess)
@@ -69,15 +102,16 @@ def recommend_news(index, top_n=5):
     return [df.iloc[i[0]][TEXT_COLUMN] for i in scores]
 
 # -------------------------------------------------
-# SIDEBAR (STATEFUL)
+# SIDEBAR
 # -------------------------------------------------
 st.sidebar.header("🛠 Controls")
+st.sidebar.write("Select an article to get similar news.")
 
 if "article_index" not in st.session_state:
     st.session_state.article_index = 0
 
 st.session_state.article_index = st.sidebar.selectbox(
-    "Choose a News Article",
+    "Choose News Article",
     options=df.index,
     index=st.session_state.article_index,
     format_func=lambda x: df.iloc[x][TEXT_COLUMN][:90] + "..."
@@ -85,24 +119,29 @@ st.session_state.article_index = st.sidebar.selectbox(
 
 top_n = st.sidebar.slider(
     "Number of recommendations",
-    min_value=3,
-    max_value=10,
-    value=5
+    3, 10, 5
 )
 
 # -------------------------------------------------
-# MAIN CONTENT (TOP → BOTTOM)
+# SELECTED ARTICLE
 # -------------------------------------------------
-
-# 🔹 Selected Article (TOP)
+st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("📄 Selected Article")
-with st.container(border=True):
-    st.write(df.iloc[st.session_state.article_index][TEXT_COLUMN])
+st.write(df.iloc[st.session_state.article_index][TEXT_COLUMN])
+st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
+# -------------------------------------------------
+# RECOMMEND BUTTON (CENTERED)
+# -------------------------------------------------
+st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+clicked = st.button("✨ Recommend Similar Articles")
+st.markdown("</div>", unsafe_allow_html=True)
 
-# 🔹 Recommend Button
-if st.button("🚀 Generate Recommendations"):
+# -------------------------------------------------
+# RECOMMENDATIONS
+# -------------------------------------------------
+if clicked:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("🔍 Recommended Articles")
 
     recommendations = recommend_news(
@@ -114,13 +153,14 @@ if st.button("🚀 Generate Recommendations"):
         with st.expander(f"📰 Recommendation {i}"):
             st.write(rec)
 
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # -------------------------------------------------
 # FOOTER
 # -------------------------------------------------
 st.markdown(
     """
-    <hr>
-    <p style='text-align:center; font-size:14px;'>
+    <p style='text-align:center; font-size:14px; color:#666;'>
     Built with NLP, TF-IDF & Cosine Similarity | Streamlit
     </p>
     """,

@@ -47,10 +47,6 @@ streamlit run app.py
 
 ## 🚀 Live Demo
 
-👉 *Add your Streamlit app link here*
+👉 *[https://news-recommendation-system-nlp.streamlit.app/]*
 
 ---
-
-## 👤 Author
-
-**Seetha Ram**

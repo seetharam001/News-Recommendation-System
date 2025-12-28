@@ -17,35 +17,26 @@ st.set_page_config(
 )
 
 # -------------------------------------------------
-# CUSTOM CSS (CLEAN & PROFESSIONAL)
+# FLAT DARK-LIGHT UI (NO WHITE CARDS)
 # -------------------------------------------------
 st.markdown(
     """
     <style>
     .main {
-        background-color: #f6f8fb;
+        background-color: #eef1f6;
     }
     .block-container {
         padding-top: 1.5rem;
         padding-bottom: 2rem;
     }
-    .card {
-        background-color: #ffffff;
-        padding: 18px 22px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        margin-bottom: 18px;
-    }
-    .title {
-        text-align: center;
-        font-size: 34px;
-        font-weight: 700;
-        margin-bottom: 4px;
+    h1, h2, h3 {
+        color: #1f2937;
     }
     .subtitle {
         text-align: center;
         font-size: 16px;
-        color: #666;
+        color: #4b5563;
+        margin-top: -10px;
     }
     </style>
     """,
@@ -53,16 +44,15 @@ st.markdown(
 )
 
 # -------------------------------------------------
-# HEADER
+# HEADER (NO CARD)
 # -------------------------------------------------
 st.markdown(
     """
-    <div class="card">
-        <div class="title">📰 AI News Recommendation System</div>
-        <div class="subtitle">
-            Discover similar news articles using NLP & Machine Learning
-        </div>
-    </div>
+    <h1 style="text-align:center;">📰 AI News Recommendation System</h1>
+    <p class="subtitle">
+    Discover similar news articles using NLP & Machine Learning
+    </p>
+    <hr>
     """,
     unsafe_allow_html=True
 )
@@ -125,13 +115,11 @@ top_n = st.sidebar.slider(
 # -------------------------------------------------
 # SELECTED ARTICLE
 # -------------------------------------------------
-st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("📄 Selected Article")
 st.write(df.iloc[st.session_state.article_index][TEXT_COLUMN])
-st.markdown("</div>", unsafe_allow_html=True)
 
 # -------------------------------------------------
-# RECOMMEND BUTTON (CENTERED)
+# BUTTON
 # -------------------------------------------------
 st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
 clicked = st.button("✨ Recommend Similar Articles")
@@ -141,7 +129,6 @@ st.markdown("</div>", unsafe_allow_html=True)
 # RECOMMENDATIONS
 # -------------------------------------------------
 if clicked:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("🔍 Recommended Articles")
 
     recommendations = recommend_news(
@@ -153,14 +140,13 @@ if clicked:
         with st.expander(f"📰 Recommendation {i}"):
             st.write(rec)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
 # -------------------------------------------------
 # FOOTER
 # -------------------------------------------------
 st.markdown(
     """
-    <p style='text-align:center; font-size:14px; color:#666;'>
+    <hr>
+    <p style='text-align:center; font-size:14px; color:#4b5563;'>
     Built with NLP, TF-IDF & Cosine Similarity | Streamlit
     </p>
     """,
